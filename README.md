@@ -7,7 +7,7 @@ and providing answers to the following questions:
 * given a location, what is the corresponding "jump-to-def" location (where the entity is declared)?
 * given a location, what are all the locations where the entity at that location is referenced (including its declaration)?
 
-In answering these questions, the language server is expected to implement a subset of the
+To answer these questions, a language server must implement a subset of the
 [Microsoft Language Server Protocol](https://github.com/Microsoft/language-server-protocol) (LSP).
 
 ## Required Methods
@@ -22,8 +22,7 @@ The method subset of LSP which must be implemented includes:
 
 ## Definitions
 
-1. A **workspace** is a git repository at a particular revision (commit SHA); the repository sources are located at
-the `rootPath` specified in the `initialize` request
+1. A **workspace** is a directory tree containing source code files (rooted at the `rootPath` specified in the `initialize` request)
 2. **language server** (or **LS**) is the generic name of a backend implementing LSP (or the subset shown above)
 3. **LSP** is the name of the [protocol defined by Microsoft](https://github.com/Microsoft/language-server-protocol) for
 clients to communicate with language servers
