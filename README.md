@@ -66,7 +66,7 @@ langserver --root=/path/to/repo python # spawn a subprocess and communicate over
 
 This project also provides an automated test harness which you should hook up to your language server.
 A reference implementation is provided in `python.go` and `python_test.go` (which expects you have installed
-[`langserver-python`](https://github.com/sourcegraph/langserver-python/) on your `$PATH`. The langserver
+[`langserver-python`](https://github.com/sourcegraph/langserver-python/) in your `$PATH`). The langserver
 command per language is registered at the top of of `main.go`.
 
 You may use this project to test your language server in CI by running the subset of tests for
