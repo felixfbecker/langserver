@@ -1,4 +1,4 @@
-# LSP Language Server
+# Language server extensions for Visual Studio Code
 
 A language server is responsible for statically analyzing source code, usually for a single language,
 and providing answers to the following questions:
