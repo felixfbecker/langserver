@@ -1,8 +1,8 @@
 # Sourcegraph Language Server
 
 This project specifies how Sourcegraph (the application running at [sourcegraph.com](https://sourcegraph.com/))
-communicates with a *Language Server*. A Language Server is responsible for statically analyzing repository
-sources, usually for a single language, and providing answers to the following questions:
+communicates with a *Language Server*. A Language Server is responsible for statically analyzing source code,
+usually for a single language, and providing answers to the following questions:
 
 * given a location (a character offset in a file), what is the "hover tooltip" (summarizing the entity at that location)?
 * given a location, what is the corresponding "jump-to-def" location (where the entity is declared)?
