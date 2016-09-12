@@ -42,7 +42,11 @@ Note: very little knowledge of Go beyond what's shown above is required.
 
 Write a program which speaks LSP over stdin and stdout (and/or runs a TCP listener and speaks LSP over the socket).
 
-You should test your language server using [VSCode](https://code.visualstudio.com/) as a reference client. To wire your language server to VSCode, [follow the `vscode-client` README](https://github.com/sourcegraph/sourcegraph/blob/master/lang/vscode-client/README.md).
+You should test your language server using [VSCode](https://code.visualstudio.com/) as a reference client.
+To wire your language server to VSCode, follow the [vscode-client README](https://github.com/sourcegraph/langserver/blob/master/vscode-client/README.md).
+
+RPC data will be normal LSP methods, so may develop your language server directly against [VSCode](https://code.visualstudio.com/)
+as a reference client implementation. I.e. you may test "hover", "jump-to-def", and "find-references" directly inside VSCode.
 
 ## Testing
 
@@ -65,12 +69,13 @@ langserver --root=/path/to/repo python # spawn a subprocess and communicate over
 ### Test Harness
 
 This project also provides an automated test harness which you should hook up to your language server.
-A reference implementation is provided in `python.go` and `python_test.go` (which expects you have installed
-[`langserver-python`](https://github.com/sourcegraph/langserver-python/) in your `$PATH`). The langserver
-command per language is registered at the top of of `main.go`.
+A reference implementation is provided in [`python.go`](https://github.com/sourcegraph/langserver/blob/master/python.go)
+and [`python_test.go`](https://github.com/sourcegraph/langserver/blob/master/python_test.go) (which expects you have installed
+[`langserver-python`](https://github.com/sourcegraph/langserver-python/) in your `$PATH`. The langserver
+command per language is registered at the top of of [`main.go`](https://github.com/sourcegraph/langserver/blob/master/main.go).
 
 You may use this project to test your language server in CI by running the subset of tests for
-your language, e.g. in your `circle.yml` or `travis.yml`:
+your language, e.g. in a `circle.yml` or `travis.yml`:
 
 ```bash
 # get test harness and test data, which you check into this repository
