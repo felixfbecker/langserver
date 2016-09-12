@@ -115,9 +115,8 @@ many times. To preserve computing resoures, a language server will only be "acti
 in memory) while it is serving active user requests. Once it receives a request to `shutdown`, if there is anything the
 server can do to make the next requests on the workspace faster (i.e. when there is a new active user), it should try to.
 The language server may read/write data to disk to improve performance between lifecycles.
-1. On Sourcegraph.com, a language server should *_not_* assume that workspace dependencies are available on the filesystem
-(e.g. a `$GOPATH`, `$MAVEN_HOME` directory, etc.). If possible, the language server should work correctly for some tokens
-even without resolved workspace dependencies. A language server should _not_ try to resolve/fetch dependencies, and should
+1. On Sourcegraph.com, a language server should produce whatever results possible even if the workspace dependencies are not available on the filesystem
+(e.g. a `$GOPATH`, `$MAVEN_HOME` directory, etc.). A language server should _not_ try to resolve/fetch dependencies, and should
 assume the caller will (eventually) do so.
 
 ## Extending
