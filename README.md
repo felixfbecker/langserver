@@ -40,18 +40,15 @@ Note: very little knowledge of Go beyond what's shown above is required.
 
 ## Development
 
-Write a program which reads JSON RPC data over stdin (and/or tcp sockets) and writes to stdout (or tcp).
+Write a program which speaks LSP over stdin and stdout (and/or runs a TCP listener and speaks LSP over the socket).
 
-RPC data will be normal LSP methods, so may develop your language server directly against [VSCode](https://code.visualstudio.com/)
-as a reference client implementation. I.e. you may test "hover", "jump-to-def", and "find-references" directly inside VSCode.
-
-To wire your language server to VSCode, [follow the `vscode-client` README](https://github.com/sourcegraph/sourcegraph/blob/master/lang/vscode-client/README.md).
+You should test your language server using [VSCode](https://code.visualstudio.com/) as a reference client. To wire your language server to VSCode, [follow the `vscode-client` README](https://github.com/sourcegraph/sourcegraph/blob/master/lang/vscode-client/README.md).
 
 ## Testing
 
 This project provides two tools for testing your language server:
 
-- a REPL to make requests over stdio or tcp to your language server
+- a REPL to make requests over stdio or TCP to your language server
 - an automated test harness
 
 ### REPL
@@ -60,7 +57,7 @@ Assuming you ran `go install github.com/sourcegraph/langserver`, use the install
 to enter a REPL where you can make requests to a language server:
 
 ```bash
-langserver --root=/path/to/repo --mode=tcp # connect to a language server over tcp port 2088
+langserver --root=/path/to/repo --mode=tcp # connect to a language server over TCP port 2088
 langserver --root=/path/to/repo --mode=tcp --addr=4444 # port 4444
 langserver --root=/path/to/repo python # spawn a subprocess and communicate over stdio
 ```
@@ -109,7 +106,7 @@ For running on Sourcegraph.com (vs. against VSCode), the design of your language
 considerations into account:
 
 1. On Sourcegraph.com, a language server may operate on a single workspace over stdin (i.e. 1 process → 1 workspace)
-**or** on multiple workspaces via tcp with each connection representing a discrete workspace (i.e. 1 process → N workspaces).
+**or** on multiple workspaces via TCP with each connection representing a discrete workspace (i.e. 1 process → N workspaces).
 Different schemes may improve the performance of your server in practice, so we suggest you implement support for both.
 1. On Sourcegraph.com, many requests are received after `initialize` and before `shutdown`; the language server should
 make subsequent requests as fast as possible (and can trade memory for speed, but should free all memory at `shutdown`).
