@@ -1,8 +1,7 @@
-# Sourcegraph Language Server
+# LSP Language Server
 
-This project specifies how Sourcegraph (the application running at [sourcegraph.com](https://sourcegraph.com/))
-communicates with a *language server*. A language server is responsible for statically analyzing source code,
-usually for a single language, and providing answers to the following questions:
+A language server is responsible for statically analyzing source code, usually for a single language,
+and providing answers to the following questions:
 
 * given a location (a character offset in a file), what is the "hover tooltip" (summarizing the entity at that location)?
 * given a location, what is the corresponding "jump-to-def" location (where the entity is declared)?
@@ -13,7 +12,7 @@ In answering these questions, the language server is expected to implement a sub
 
 ## Required Methods
 
-The method subset of LSP which must be implemented for the language server to work with Sourcegraph are:
+The method subset of LSP which must be implemented includes:
 
 * [`initialize`](https://github.com/Microsoft/language-server-protocol/blob/master/protocol.md#initialize-request)
 * [`textDocument/definition`](https://github.com/Microsoft/language-server-protocol/blob/master/protocol.md#goto-definition-request)
@@ -44,9 +43,6 @@ Write a program which speaks LSP over stdin and stdout (and/or runs a TCP listen
 
 You should test your language server using [VSCode](https://code.visualstudio.com/) as a reference client.
 To wire your language server to VSCode, follow the [vscode-client README](https://github.com/sourcegraph/langserver/blob/master/vscode-client/README.md).
-
-RPC data will be normal LSP methods, so may develop your language server directly against [VSCode](https://code.visualstudio.com/)
-as a reference client implementation. I.e. you may test "hover", "jump-to-def", and "find-references" directly inside VSCode.
 
 ## Testing
 
@@ -93,36 +89,16 @@ go test $(go list ./... | grep -v /vendor/ | grep $LANGUAGE)
 
 ## Delivering
 
-Before we plug your language server into Sourcegraph, we need some additional information about its characteristics:
+In addition to the language server sources, provide some additional information about its characteristics:
 
 - what are the memory requirements for sample (small/medium/large) workspaces?
 - what is the delay after the first call to `initialize` to answer `hover`, `definition`, and `references` requests?
 - does the above metric change on subsequent requests to `initialize` workspaces (after they have been `shutdown`)?
 
-Once your language server is integrated into sourcegraph.com, we will perform automated performance testing
-on your server and aim to meet these performance benchmarks:
+Aim to meet these performance benchmarks:
 
 - <500ms P95 latency for `definition` & `hover` requests
 - <10s P95 latency for `references` request
-
-### Practical Considerations for Sourcegraph.com
-
-For running on Sourcegraph.com (vs. against VSCode), the design of your language server should take these
-considerations into account:
-
-1. On Sourcegraph.com, a language server may operate on a single workspace over stdin (i.e. 1 process → 1 workspace)
-**or** on multiple workspaces via TCP with each connection representing a discrete workspace (i.e. 1 process → N workspaces).
-Different schemes may improve the performance of your server in practice, so we suggest you implement support for both.
-1. On Sourcegraph.com, many requests are received after `initialize` and before `shutdown`; the language server should
-make subsequent requests as fast as possible (and can trade memory for speed, but should free all memory at `shutdown`).
-1. On Sourcegraph.com, a language server will go through the full `initialize` → [requests] → `shutdown` lifecycle
-many times. To preserve computing resoures, a language server will only be "active" (i.e. have data structures
-in memory) while it is serving active user requests. Once it receives a request to `shutdown`, if there is anything the
-server can do to make the next requests on the workspace faster (i.e. when there is a new active user), it should try to.
-The language server may read/write data to disk to improve performance between lifecycles.
-1. On Sourcegraph.com, a language server should produce whatever results possible even if the workspace dependencies are not available on the filesystem
-(e.g. a `$GOPATH`, `$MAVEN_HOME` directory, etc.). A language server should _not_ try to resolve/fetch dependencies, and should
-assume the caller will (eventually) do so.
 
 ## Extending
 
