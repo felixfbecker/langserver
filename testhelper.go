@@ -23,7 +23,7 @@ func initTest(lang, mode string, tc *testCase) (*lspConn, *exec.Cmd, error) {
 	case "stdio":
 		c, e, err = newStdioClient(cmd)
 	case "tcp":
-		c, e, err = newTCPClient(cmd, "2088")
+		c, err = newTCPClient("2088")
 	default:
 		return nil, nil, fmt.Errorf("invalid mode %s", mode)
 	}
@@ -53,7 +53,9 @@ func runHoverTests(lang, mode string, tc *testCase, t *testing.T) {
 
 	defer c.Shutdown()
 	defer c.Close()
-	defer e.Process.Kill()
+	if e != nil {
+		defer e.Process.Kill()
+	}
 
 	for i, hc := range tc.HoverCases {
 		resp, err := c.Hover(hc.ToRequestParams())
@@ -87,7 +89,9 @@ func runDefinitionTests(lang, mode string, tc *testCase, t *testing.T) {
 
 	defer c.Shutdown()
 	defer c.Close()
-	defer e.Process.Kill()
+	if e != nil {
+		defer e.Process.Kill()
+	}
 
 	for i, dc := range tc.DefinitionCases {
 		resp, err := c.Definition(dc.ToRequestParams())
@@ -106,7 +110,9 @@ func runReferencesTests(lang, mode string, tc *testCase, t *testing.T) {
 
 	defer c.Shutdown()
 	defer c.Close()
-	defer e.Process.Kill()
+	if e != nil {
+		defer e.Process.Kill()
+	}
 
 	for i, rc := range tc.ReferencesCases {
 		resp, err := c.References(rc.ToRequestParams())

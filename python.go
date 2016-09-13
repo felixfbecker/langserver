@@ -32,7 +32,7 @@ and performs extra validation.
 			Character: 20,
 			Resp: []lsp.Location{
 				lsp.Location{
-					URI: "file:///Users/rothfels/go/src/github.com/sourcegraph/langserver-test/test_repos/github.com/jkbrzt/httpie/httpie/cli.py", // TODO: use workspace-relative path
+					URI: "file:///Users/rothfels/go/src/github.com/sourcegraph/langserver/test_repos/github.com/jkbrzt/httpie/httpie/cli.py", // TODO: use workspace-relative path
 					Range: lsp.Range{
 						Start: lsp.Position{
 							Line:      25,
@@ -55,7 +55,7 @@ and performs extra validation.
 			Resp: []lsp.Location{
 				// TODO: this should include the declaration; it doesn't.
 				lsp.Location{
-					URI: "file:///Users/rothfels/go/src/github.com/sourcegraph/langserver-test/test_repos/github.com/jkbrzt/httpie/httpie/cli.py", // TODO: use workspace-relative path
+					URI: "file:///Users/rothfels/go/src/github.com/sourcegraph/langserver/test_repos/github.com/jkbrzt/httpie/httpie/cli.py", // TODO: use workspace-relative path
 					Range: lsp.Range{
 						Start: lsp.Position{
 							Line:      37,
@@ -68,7 +68,7 @@ and performs extra validation.
 					},
 				},
 				lsp.Location{
-					URI: "file:///Users/rothfels/go/src/github.com/sourcegraph/langserver-test/test_repos/github.com/jkbrzt/httpie/httpie/cli.py", // TODO: use workspace-relative path
+					URI: "file:///Users/rothfels/go/src/github.com/sourcegraph/langserver/test_repos/github.com/jkbrzt/httpie/httpie/cli.py", // TODO: use workspace-relative path
 					Range: lsp.Range{
 						Start: lsp.Position{
 							Line:      44,

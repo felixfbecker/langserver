@@ -84,21 +84,16 @@ func main() {
 	}
 }
 
-func newTCPClient(cmd, addr string) (*lspConn, *exec.Cmd, error) {
-	if cmd == "" || addr == "" {
-		return nil, nil, fmt.Errorf("provide a command and addr to create a lang server tcp client")
-	}
-
-	subProcess := exec.Command(cmd)
-	if err := subProcess.Start(); err != nil {
-		return nil, nil, err
+func newTCPClient(addr string) (*lspConn, error) {
+	if addr == "" {
+		return nil, fmt.Errorf("provide a command and addr to create a lang server tcp client")
 	}
 
 	conn, err := net.Dial("tcp", addr)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	return &lspConn{jsonrpc2.NewConn(ctx, conn, nil)}, subProcess, nil
+	return &lspConn{jsonrpc2.NewConn(ctx, conn, nil)}, nil
 }
 
 type stdrwc struct {
@@ -156,7 +151,7 @@ func run() error {
 
 	switch *mode {
 	case "tcp":
-		c, e, err = newTCPClient(cmd, *addr)
+		c, err = newTCPClient(*addr)
 
 	case "stdio":
 		c, e, err = newStdioClient(cmd)
@@ -170,7 +165,9 @@ func run() error {
 	}
 
 	defer c.Close()
-	defer e.Process.Kill()
+	if e != nil {
+		defer e.Process.Kill()
+	}
 
 	err = c.Initialize(*rootPath)
 	if err != nil {
@@ -210,15 +207,15 @@ func run() error {
 		switch method {
 		case "hover":
 			resp, err := c.Hover(&p)
-			printResponse(*resp, err)
+			printResponse(resp, err)
 
 		case "definition":
 			resp, err := c.Definition(&p)
-			printResponse(*resp, err)
+			printResponse(resp, err)
 
 		case "references":
 			resp, err := c.References(&p)
-			printResponse(*resp, err)
+			printResponse(resp, err)
 
 		default:
 			continue
