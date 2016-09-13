@@ -25,7 +25,9 @@ var (
 	ctx            = context.Background()
 	stdin          = bufio.NewReader(os.Stdin)
 	langServerCmds = map[string]string{
+		"go":     "langserver-go",
 		"python": "langserver-python",
+		"sample": "langserver-sample",
 	}
 )
 
