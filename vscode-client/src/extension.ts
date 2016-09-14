@@ -43,7 +43,7 @@ export function activate(context: ExtensionContext) {
 	context.subscriptions.push(startLangServer("langserver-go", ["go"]));
 	context.subscriptions.push(startLangServer("langserver-python", ["python"]));
 	context.subscriptions.push(startLangServer("langserver-ctags", ["php"]));
-	context.subscriptions.push(startLangServerTCP(2088, ["typescript", "javascript"]));
+	context.subscriptions.push(startLangServerTCP(2088, ["typescript", "javascript"])); // when developing, also set {"typescript.tsdk": "/dev/null"} in your user/workspace settings
 	context.subscriptions.push(startLangServerTCP(2088, ["java"]));
 }
 
