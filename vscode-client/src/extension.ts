@@ -42,6 +42,8 @@ export function activate(context: ExtensionContext) {
 	context.subscriptions.push(startLangServer("sample_server", ["plaintext"]));
 	context.subscriptions.push(startLangServer("langserver-go", ["go"]));
 	context.subscriptions.push(startLangServer("langserver-python", ["python"]));
+	context.subscriptions.push(startLangServer("langserver-ctags", ["php"]));
 	context.subscriptions.push(startLangServerTCP(2088, ["typescript", "javascript"]));
+	context.subscriptions.push(startLangServerTCP(2088, ["java"]));
 }
 
