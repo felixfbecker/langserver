@@ -30,65 +30,55 @@ clients to communicate with language servers
 ## Getting Started
 
 - [Install Go](https://golang.org/doc/install) and [set up your workspace for Go development](https://golang.org/doc/code.html).
-- `go get -u github.com/sourcegraph/langserver`
-- `cd $GOPATH/github.com/sourcegraph/langserver`
-- `go test $(go list ./... | grep -v /vendor/ | grep $LANGUAGE)`
-
-Note: very little knowledge of Go beyond what's shown above is required.
+- Install the existing Go language server:
+```bash
+go get -u github.com/sourcegraph/langserver-go
+```
+- Verify the Go language server works with your installation of VSCode:
+```bash
+cd vscode-client
+npm install
+npm run vscode -- $GOPATH/src/github.com/sourcegraph/langserver-go
+```
+- Write a server that you can hook up via stdio using vscode-client and prints a static string
+as a response for any hover interaction, and verify it works in VSCode
+- Properly implement hover (and other methods) and continue testing against VSCode.
 
 ## Development
 
-Write a program which speaks LSP over stdin and stdout (and/or runs a TCP listener and speaks LSP over the socket).
+You will write a program which speaks LSP over stdin and stdout (and/or runs a TCP listener and speaks LSP over the socket).
 
 You should test your language server using [VSCode](https://code.visualstudio.com/) as a reference client.
 To wire your language server to VSCode, follow the [vscode-client README](https://github.com/sourcegraph/langserver/blob/master/vscode-client/README.md).
 
 ## Testing
 
-This project provides two tools for testing your language server:
+This project provides two tools to help you test your language server:
 
 - a REPL to make requests over stdio or TCP to your language server
-- an automated test harness
+- an automated test harness (written in Go)
 
 ### REPL
 
-Assuming you ran `go install github.com/sourcegraph/langserver`, use the installed `langserver` command
-to enter a REPL where you can make requests to a language server:
-
 ```bash
-langserver --root=/path/to/repo --mode=tcp # connect to a language server over TCP port 2088
-langserver --root=/path/to/repo --mode=tcp --addr=4444 # port 4444
-langserver --root=/path/to/repo python # spawn a subprocess and communicate over stdio
+go install ./lspcli
+lspcli --root=/path/to/repo --mode=tcp # connect to a language server over TCP port 2088
+lspcli --root=/path/to/repo --mode=tcp --addr=4444 # port 4444
+lspcli --root=/path/to/repo --cmd=langserver-python # spawn a subprocess and communicate over stdio
 ```
 
 ### Test Harness
 
-This project also provides an automated test harness which you should hook up to your language server.
-A reference implementation is provided in [`python.go`](https://github.com/sourcegraph/langserver/blob/master/python.go)
-and [`python_test.go`](https://github.com/sourcegraph/langserver/blob/master/python_test.go) (which expects you have installed
-[`langserver-python`](https://github.com/sourcegraph/langserver-python/) in your `$PATH`. The langserver
-command per language is registered at the top of of [`main.go`](https://github.com/sourcegraph/langserver/blob/master/main.go).
-
-You may use this project to test your language server in CI by running the subset of tests for
-your language, e.g. in a `circle.yml` or `travis.yml`:
-
-```bash
-# get test harness and test data, which you check into this repository
-go get github.com/sourcegraph/langserver
-
-# install your language server, e.g.
-go get github.com/sourcegraph/langserver-python
-# and other environment setup...
-
-# run tests
-cd $GOPATH/github.com/sourcegraph/langserver
-export LANGUAGE=python
-go test $(go list ./... | grep -v /vendor/ | grep $LANGUAGE)
-```
+This project provides an automated test harness in Go which you may use to test your language server.
+A reference implementation is provided for [`langserver-go`](https://github.com/sourcegraph/langserver-go/blob/master/go_test.go)
+and [`langserver-python`](https://github.com/sourcegraph/langserver-python/blob/master/python_test.go).
 
 ## Delivering
 
-In addition to the language server sources, provide some additional information about its characteristics:
+Deliver your language server with CI running a suite of test cases for hover, definition, and references requests
+against sample repositories of your choice.
+
+In addition, provide some additional information about your language server characteristics in the README:
 
 - what are the memory requirements for sample (small/medium/large) workspaces?
 - what is the delay after the first call to `initialize` to answer `hover`, `definition`, and `references` requests?
