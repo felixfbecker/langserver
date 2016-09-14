@@ -99,3 +99,9 @@ Aim to meet these performance benchmarks:
 - make `textDocument/definition` support jumping to "external" definitions
     - e.g. by jumping to vendored dependencies, returning a value from the *global namespace*, or returning query
     parameters to run against the *global namespace*d defs.
+
+## Existing Language Servers
+
+- [langserver-go](https://github.com/sourcegraph/langserver-go)
+- [langserver-python](https://github.com/sourcegraph/langserver-python)
+- [langserver-ctags](https://github.com/sourcegraph/langserver-ctags)
