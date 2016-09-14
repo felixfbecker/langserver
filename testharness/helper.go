@@ -1,32 +1,24 @@
-package main
+package testharness
 
 import (
-	"fmt"
+	"context"
 	"os"
 	"os/exec"
 	"testing"
 
+	"github.com/sourcegraph/langserver/client"
+
 	"sourcegraph.com/sourcegraph/sourcegraph/pkg/lsp"
 )
 
-func initTest(lang, mode string, tc *testCase) (*lspConn, *exec.Cmd, error) {
-	cmd, ok := langServerCmds[lang]
-	if !ok {
-		return nil, nil, fmt.Errorf("no command found for lang %s", lang)
-	}
+var ctx = context.Background()
 
-	var c *lspConn
+func initTest(cmd string, tc *TestCase) (*client.LspConn, *exec.Cmd, error) {
+	var c *client.LspConn
 	var e *exec.Cmd
 	var err error
 
-	switch mode {
-	case "stdio":
-		c, e, err = newStdioClient(cmd)
-	case "tcp":
-		c, err = newTCPClient("2088")
-	default:
-		return nil, nil, fmt.Errorf("invalid mode %s", mode)
-	}
+	c, e, err = client.NewStdioClient(ctx, cmd)
 
 	dir, err := os.Getwd()
 	if err != nil {
@@ -35,7 +27,7 @@ func initTest(lang, mode string, tc *testCase) (*lspConn, *exec.Cmd, error) {
 		return nil, nil, err
 	}
 
-	err = c.Initialize(dir + "/test_repos/" + tc.Repo)
+	err = c.Initialize(ctx, dir+"/test_repos/"+tc.Repo)
 	if err != nil {
 		c.Close()
 		e.Process.Kill()
@@ -45,20 +37,19 @@ func initTest(lang, mode string, tc *testCase) (*lspConn, *exec.Cmd, error) {
 	return c, e, nil
 }
 
-func runHoverTests(lang, mode string, tc *testCase, t *testing.T) {
-	c, e, err := initTest(lang, mode, tc)
+// RunHoverTests executes a TestCase's hover tests.
+func RunHoverTests(cmd string, tc *TestCase, t *testing.T) {
+	c, e, err := initTest(cmd, tc)
 	if err != nil {
 		t.Error(err)
 	}
 
-	defer c.Shutdown()
+	defer c.Shutdown(ctx)
 	defer c.Close()
-	if e != nil {
-		defer e.Process.Kill()
-	}
+	defer e.Process.Kill()
 
 	for i, hc := range tc.HoverCases {
-		resp, err := c.Hover(hc.ToRequestParams())
+		resp, err := c.Hover(ctx, hc.ToRequestParams())
 		if err != nil {
 			t.Errorf("Error returned for hover (case #%d): %v", i, err)
 		}
@@ -81,20 +72,19 @@ func checkHoverResponse(i int, expected *lsp.Hover, got *lsp.Hover, t *testing.T
 	}
 }
 
-func runDefinitionTests(lang, mode string, tc *testCase, t *testing.T) {
-	c, e, err := initTest(lang, mode, tc)
+// RunDefinitionTests executes a TestCase's definition tests.
+func RunDefinitionTests(cmd string, tc *TestCase, t *testing.T) {
+	c, e, err := initTest(cmd, tc)
 	if err != nil {
 		t.Error(err)
 	}
 
-	defer c.Shutdown()
+	defer c.Shutdown(ctx)
 	defer c.Close()
-	if e != nil {
-		defer e.Process.Kill()
-	}
+	defer e.Process.Kill()
 
 	for i, dc := range tc.DefinitionCases {
-		resp, err := c.Definition(dc.ToRequestParams())
+		resp, err := c.Definition(ctx, dc.ToRequestParams())
 		if err != nil {
 			t.Errorf("Error returned for definition (case #%d): %v", i, err)
 		}
@@ -102,20 +92,19 @@ func runDefinitionTests(lang, mode string, tc *testCase, t *testing.T) {
 	}
 }
 
-func runReferencesTests(lang, mode string, tc *testCase, t *testing.T) {
-	c, e, err := initTest(lang, mode, tc)
+// RunReferencesTests executes a TestCase's references tests.
+func RunReferencesTests(cmd string, tc *TestCase, t *testing.T) {
+	c, e, err := initTest(cmd, tc)
 	if err != nil {
 		t.Error(err)
 	}
 
-	defer c.Shutdown()
+	defer c.Shutdown(ctx)
 	defer c.Close()
-	if e != nil {
-		defer e.Process.Kill()
-	}
+	defer e.Process.Kill()
 
 	for i, rc := range tc.ReferencesCases {
-		resp, err := c.References(rc.ToRequestParams())
+		resp, err := c.References(ctx, rc.ToRequestParams())
 		if err != nil {
 			t.Errorf("Error returned for definition (case #%d): %v", i, err)
 		}
