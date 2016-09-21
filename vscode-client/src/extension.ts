@@ -43,7 +43,9 @@ export function activate(context: ExtensionContext) {
 	context.subscriptions.push(startLangServer("langserver-go", ["go"]));
 	context.subscriptions.push(startLangServer("langserver-python", ["python"]));
 	context.subscriptions.push(startLangServer("langserver-ctags", ["php"]));
-	context.subscriptions.push(startLangServerTCP(2088, ["typescript", "javascript"])); // when developing, also set {"typescript.tsdk": "/dev/null"} in your user/workspace settings
+	// When developing JS/TS, set {"typescript.tsdk": "/dev/null"} in your user settings in the
+	// new VSCode window opened via `npm run vscode`.
+	context.subscriptions.push(startLangServerTCP(2089, ["typescript", "typescriptreact", "javascript", "javascriptreact"]));
 	context.subscriptions.push(startLangServerTCP(2088, ["java"]));
 }
 
