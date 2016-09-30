@@ -6,6 +6,8 @@ and providing answers to the following questions:
 * given a location (a character offset in a file), what is the "hover tooltip" (summarizing the entity at that location)?
 * given a location, what is the corresponding "jump-to-def" location (where the entity is declared)?
 * given a location, what are all the locations where the entity at that location is referenced (including its declaration)?
+* what are all the definitions (in a workspace) that a user can "jump-to" by name
+  * these would typically be the types/classes/functions/methods appearing on documentation sites, "public" APIs, declarations indexed by ctags, "top-level" identifiers, etc. (i.e. not local variables)
 
 To answer these questions, a language server must implement a subset of the
 [Microsoft Language Server Protocol](https://github.com/Microsoft/language-server-protocol) (LSP).
@@ -15,9 +17,11 @@ To answer these questions, a language server must implement a subset of the
 The method subset of LSP which must be implemented includes:
 
 * [`initialize`](https://github.com/Microsoft/language-server-protocol/blob/master/protocol.md#initialize-request)
+* [`textDocument/didOpen`](https://github.com/Microsoft/language-server-protocol/blob/master/protocol.md#didopentextdocument-notification)
 * [`textDocument/definition`](https://github.com/Microsoft/language-server-protocol/blob/master/protocol.md#goto-definition-request)
 * [`textDocument/hover`](https://github.com/Microsoft/language-server-protocol/blob/master/protocol.md#hover-request)
 * [`textDocument/references`](https://github.com/Microsoft/language-server-protocol/blob/master/protocol.md#find-references-request)
+* [`workspace/symbol`](https://github.com/Microsoft/language-server-protocol/blob/master/protocol.md#workspace-symbols-request)
 * [`shutdown`](https://github.com/Microsoft/language-server-protocol/blob/master/protocol.md#shutdown-request)
 
 ## Definitions
@@ -30,19 +34,17 @@ clients to communicate with language servers
 ## Getting Started
 
 - [Install Go](https://golang.org/doc/install) and [set up your workspace for Go development](https://golang.org/doc/code.html).
-- Install the existing Go language server:
+- Install the sample language server:
 ```bash
-go get -u github.com/sourcegraph/langserver-go
+go get -u github.com/sourcegraph/langserver/langserver-sample
 ```
-- Verify the Go language server works with your installation of VSCode:
+- Verify the sample language server works with your installation of VSCode:
 ```bash
 cd vscode-client
 npm install
-npm run vscode -- $GOPATH/src/github.com/sourcegraph/langserver-go
+npm run vscode -- $GOPATH/src/github.com/sourcegraph/langserver
 ```
-- Write a server that you can hook up via stdio using vscode-client and prints a static string
-as a response for any hover interaction, and verify it works in VSCode
-- Properly implement hover (and other methods) and continue testing against VSCode.
+- Open a plain text file (e.g. `vscode-client/License.txt`), hover over some text.
 
 ## Development
 
@@ -51,57 +53,40 @@ You will write a program which speaks LSP over stdin and stdout (and/or runs a T
 You should test your language server using [VSCode](https://code.visualstudio.com/) as a reference client.
 To wire your language server to VSCode, follow the [vscode-client README](https://github.com/sourcegraph/langserver/blob/master/vscode-client/README.md).
 
+Your language server is expected to operate in memory and use a filesystem overlay. Once the language server receives
+an `initialize` request, it will subsequently receive file sources and dependencies via `textDocument/didOpen`.
+Use this method to construct the filesystem overlay. The language server should only read from disk if the
+filesystem overlay doesn't contain an entry with file contents.
+
+It is ok and desirable to keep warm data structures / indexes in memory to speed up subsequent requests.
+
 ## Testing
 
-This project provides two tools to help you test your language server:
-
-- a REPL to make requests over stdio or TCP to your language server
-- an automated test harness (written in Go)
-
-### REPL
+For convenience, this project includes a REPL to make request to your language server over stdio (or a TCP connection):
 
 ```bash
 go install ./lspcli
 lspcli --root=/path/to/repo --mode=tcp # connect to a language server over TCP port 2088
 lspcli --root=/path/to/repo --mode=tcp --addr=4444 # port 4444
-lspcli --root=/path/to/repo --cmd=langserver-python # spawn a subprocess and communicate over stdio
+lspcli --root=/path/to/repo --cmd=langserver-sample # spawn a subprocess and communicate over stdio
 ```
-
-### Test Harness
-
-This project provides an automated test harness in Go which you may use to test your language server.
-A reference implementation is provided for [`langserver-go`](https://github.com/sourcegraph/langserver-go/blob/master/go_test.go)
-and [`langserver-python`](https://github.com/sourcegraph/langserver-python/blob/master/python_test.go).
 
 ## Delivering
 
-Deliver your language server with CI running a suite of test cases for hover, definition, and references requests
-against sample repositories of your choice.
+Deliver your language server with CI running a suite of test cases for `textDocument/hover`, `textDocument/definition`, `textDocument/references`, and
+`workspace/symbol` requests against sample repositories of your choice.
 
-In addition, provide some additional information about your language server characteristics in the README:
+Provide some additional information about your language server characteristics in the README:
 
 - what are the memory requirements for sample (small/medium/large) workspaces?
-- what is the delay after the first call to `initialize` to answer `hover`, `definition`, and `references` requests?
-- does the above metric change on subsequent requests to `initialize` workspaces (after they have been `shutdown`)?
+- what are the performance characteristics of `textDocument/hover`, `textDocument/definition`, `textDocument/references`, and `workspace/symbol` requests?
 
-Aim to meet these performance benchmarks:
+## LSP Method Details
 
-- <500ms P95 latency for `definition` & `hover` requests
-- <10s P95 latency for `references` request
+- `textDocument/hover` may return two types of `MarkedString`:
+  - `language="text/html"`: a documentation string
+  - `language="$LANG"`: a type signature
+- `workspace/symbol` will be queried in two ways:
+  - `query=""`: return all symbols for "jump-to" by name
+  - `query="type:external-reference"`: return all references to declarations outside of the project (to dependencies, standard libraries, etc.)
 
-## Extending
-
-- [`workspace/symbol`](https://github.com/Microsoft/language-server-protocol/blob/master/protocol.md#workspace-symbols-request)
-    - this method should returning the repository's top-level identifiers for an empty query
-- *global namespace*
-    - for your particular language, choose a URI scheme which allows global namespacing of top-level identifiers
-    - it should be constructed by joining symbol's `containerName` and `name` properties
-- make `textDocument/definition` support jumping to "external" definitions
-    - e.g. by jumping to vendored dependencies, returning a value from the *global namespace*, or returning query
-    parameters to run against the *global namespace*d defs.
-
-## Existing Language Servers
-
-- [langserver-go](https://github.com/sourcegraph/langserver-go)
-- [langserver-python](https://github.com/sourcegraph/langserver-python)
-- [langserver-ctags](https://github.com/sourcegraph/langserver-ctags)
