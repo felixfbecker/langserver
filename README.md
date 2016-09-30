@@ -55,10 +55,11 @@ To wire your language server to VSCode, follow the [vscode-client README](https:
 
 Your language server is expected to operate in memory and use a filesystem overlay. Once the language server receives
 an `initialize` request, it will subsequently receive file sources and dependencies via `textDocument/didOpen`.
-Use this method to construct the filesystem overlay. The language server should only read from disk if the
-filesystem overlay doesn't contain an entry with file contents.
+Use this method to construct the filesystem overlay. When the language server performs any operation that depends on a
+file's contents, it should first try to read the contents from the overlay. If the file is not in the overlay, then the
+language server should consult the file system.
 
-It is ok and desirable to keep warm data structures / indexes in memory to speed up subsequent requests.
+It is OK and desirable to keep warm data structures/indexes in memory to speed up subsequent requests.
 
 ## Testing
 
@@ -81,6 +82,11 @@ Provide some additional information about your language server characteristics i
 - what are the memory requirements for sample (small/medium/large) workspaces?
 - what are the performance characteristics of `textDocument/hover`, `textDocument/definition`, `textDocument/references`, and `workspace/symbol` requests?
 
+Aim to meet these performance benchmarks:
+- <500ms P95 latency for `textDocument/definition` and `textDocument/hover` requests
+- <10s P95 latency for `textDocument/references` request
+- <5s P95 latency for `workspace/symbol` request
+
 ## LSP Method Details
 
 - `textDocument/hover` may return two types of `MarkedString`:
@@ -88,5 +94,6 @@ Provide some additional information about your language server characteristics i
   - `language="$LANG"`: a type signature
 - `workspace/symbol` will be queried in two ways:
   - `query=""`: return all symbols for "jump-to" by name
+    - NOTE: it's currently not possible to test this functionality directly within VSCode, as it only sends a `workspace/symbol` request for non-empty queries
   - `query="type:external-reference"`: return all references to declarations outside of the project (to dependencies, standard libraries, etc.)
 
