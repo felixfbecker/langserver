@@ -95,5 +95,8 @@ Aim to meet these performance benchmarks:
 - `workspace/symbol` will be queried in two ways:
   - `query=""`: return all symbols for "jump-to" by name
     - NOTE: it's currently not possible to test this functionality directly within VSCode, as it only sends a `workspace/symbol` request for non-empty queries
-  - `query="type:external-reference"`: return all references to declarations outside of the project (to dependencies, standard libraries, etc.)
+  - `query="is:external-reference"`: return all references to declarations outside of the project (to dependencies, standard libraries, etc.)
+    - NOTE: Always excludes vendored libraries, e.g. vendored Go packages, JS code inside a `node_modules` directory, etc.
+  - `query="is:exported"`: return only 'exported' declarations (e.g. exclude private functions/vars/etc).
+    - NOTE: Always excludes vendored libraries, e.g. vendored Go packages, JS code inside a `node_modules` directory, etc.
 
