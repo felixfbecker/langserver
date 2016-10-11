@@ -11,7 +11,7 @@ at once with minimal extra configuration per language.
 1. Run `npm run vscode` to start a new VSCode instance. Use `npm run vscode -- /path/to/mydir` to open the editor to a specific directory.
 1. Open a `.go` file and hover over text to start using the Go language server.
 
-To view a language server's stderr output in VSCode, select View → Output (temporary note: see the known issue section).
+To view a language server's stderr output in VSCode, select View → Output.
 To debug further, see the "Hacking on this extension" section below.
 
 After updating the binary for a language server (during development or after an upgrade), just kill the process (e.g., `killall langserver-go`).
