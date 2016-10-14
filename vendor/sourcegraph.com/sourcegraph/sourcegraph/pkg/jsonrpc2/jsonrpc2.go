@@ -12,6 +12,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -296,6 +297,9 @@ func (c *Conn) send(ctx context.Context, m *anyMessage, wait bool) (*call, error
 		}
 	}
 
+	fmt.Fprintf(os.Stdout, "================ BEGIN REQUEST ================\n")
+	marshalHeadersAndBody(os.Stdout, m)
+	fmt.Fprintf(os.Stdout, "\n================= END REQUEST =================\n")
 	err := marshalHeadersAndBody(c.w, m)
 	if err != nil {
 		c.w.Flush()
