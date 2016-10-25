@@ -9,8 +9,8 @@ import (
 	"net"
 	"os"
 
-	"sourcegraph.com/sourcegraph/sourcegraph/pkg/jsonrpc2"
-	"sourcegraph.com/sourcegraph/sourcegraph/pkg/lsp"
+	"github.com/sourcegraph/jsonrpc2"
+	"github.com/sourcegraph/go-langserver/pkg/lsp"
 )
 
 var (

@@ -3,17 +3,17 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "peKx+evQ2T3af4UgIi9beWOSFhs=",
-			"path": "sourcegraph.com/sourcegraph/sourcegraph/pkg/jsonrpc2",
-			"revision": "cb0a8c0aa5a9df2b289fae595e5144e84c8ecc4c",
-			"revisionTime": "2016-09-10T16:56:14Z"
+			"checksumSHA1": "k/BrpNYRXA/sL/+71KIxmuWGXWg=",
+			"path": "github.com/sourcegraph/go-langserver/pkg/lsp",
+			"revision": "cf9896ccce7b90c73ef47deb7846158106913d09",
+			"revisionTime": "2016-10-25T07:20:31Z"
 		},
 		{
-			"checksumSHA1": "1Umq1sc1eOknQXJlO/AW63O0hl0=",
-			"path": "sourcegraph.com/sourcegraph/sourcegraph/pkg/lsp",
-			"revision": "cb0a8c0aa5a9df2b289fae595e5144e84c8ecc4c",
-			"revisionTime": "2016-09-10T16:56:14Z"
+			"checksumSHA1": "YHt4D9SELrSJu6gO9FYdKCEbYNM=",
+			"path": "github.com/sourcegraph/jsonrpc2",
+			"revision": "fe0196e385d6d450c84a87037defd0c5bda3dfb9",
+			"revisionTime": "2016-10-13T11:10:05Z"
 		}
 	],
-	"rootPath": "github.com/sourcegraph/langserver-test"
+	"rootPath": "github.com/sourcegraph/langserver"
 }

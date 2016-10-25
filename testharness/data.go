@@ -1,6 +1,6 @@
 package testharness
 
-import "sourcegraph.com/sourcegraph/sourcegraph/pkg/lsp"
+import "github.com/sourcegraph/go-langserver/pkg/lsp"
 
 // TestCase includes specific hover, definition, and references cases for a
 // particular repository.

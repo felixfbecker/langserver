@@ -14,7 +14,7 @@ import (
 
 	"github.com/sourcegraph/langserver/client"
 
-	"sourcegraph.com/sourcegraph/sourcegraph/pkg/lsp"
+	"github.com/sourcegraph/go-langserver/pkg/lsp"
 )
 
 var (
