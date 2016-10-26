@@ -7,8 +7,8 @@ import (
 	"net"
 	"os/exec"
 
-	"github.com/sourcegraph/jsonrpc2"
 	"github.com/sourcegraph/go-langserver/pkg/lsp"
+	"github.com/sourcegraph/jsonrpc2"
 )
 
 // LspConn wraps a jsonrpc2.Conn for communiting with an
@@ -56,6 +56,15 @@ func (c *LspConn) References(ctx context.Context, p *lsp.TextDocumentPositionPar
 		return nil, err
 	}
 	return &refsResp, nil
+}
+
+func (c *LspConn) Symbol(ctx context.Context, p *lsp.WorkspaceSymbolParams) (*[]lsp.SymbolInformation, error) {
+	var symResp []lsp.SymbolInformation
+	err := c.Call(ctx, "workspace/symbol", p, &symResp)
+	if err != nil {
+		return nil, err
+	}
+	return &symResp, nil
 }
 
 // Shutdown makes an `shutdown` LSP request.

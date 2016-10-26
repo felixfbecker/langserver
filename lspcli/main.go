@@ -82,17 +82,29 @@ func run() error {
 			break
 		}
 
-		file := promptFile()
-		if file == "" || filepath.IsAbs(file) {
-			continue
-		}
+		var (
+			p lsp.TextDocumentPositionParams
+			q lsp.WorkspaceSymbolParams
+		)
+		if method == "symbol" {
+			query := promptQuery()
+			q = lsp.WorkspaceSymbolParams{
+				Query: query,
+				Limit: 10,
+			}
+		} else {
+			file := promptFile()
+			if file == "" || filepath.IsAbs(file) {
+				continue
+			}
 
-		line := promptLine()
-		char := promptCharacter()
+			line := promptLine()
+			char := promptCharacter()
 
-		p := lsp.TextDocumentPositionParams{
-			TextDocument: lsp.TextDocumentIdentifier{URI: file},
-			Position:     lsp.Position{Line: line, Character: char},
+			p = lsp.TextDocumentPositionParams{
+				TextDocument: lsp.TextDocumentIdentifier{URI: file},
+				Position:     lsp.Position{Line: line, Character: char},
+			}
 		}
 
 		printResponse := func(resp interface{}, err error) {
@@ -114,6 +126,10 @@ func run() error {
 
 		case "references":
 			resp, err := c.References(ctx, &p)
+			printResponse(resp, err)
+
+		case "symbol":
+			resp, err := c.Symbol(ctx, &q)
 			printResponse(resp, err)
 
 		default:
@@ -146,7 +162,7 @@ func promptInt(prompt string) int {
 }
 
 func promptMethod() string {
-	switch promptString("Choose (1) hover, (2) definition, (3) references, (4) shutdown: ") {
+	switch promptString("Choose (1) hover, (2) definition, (3) references, (4) symbol, (5) shutdown: ") {
 	case "1":
 		return "hover"
 	case "2":
@@ -154,6 +170,8 @@ func promptMethod() string {
 	case "3":
 		return "references"
 	case "4":
+		return "symbol"
+	case "5":
 		return "shutdown"
 	default:
 		return ""
@@ -162,6 +180,10 @@ func promptMethod() string {
 
 func promptFile() string {
 	return promptString("Choose a file path relative to root: ")
+}
+
+func promptQuery() string {
+	return promptString("Enter a query: ")
 }
 
 func promptLine() int {

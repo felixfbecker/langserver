@@ -9,8 +9,8 @@ import (
 	"net"
 	"os"
 
-	"github.com/sourcegraph/jsonrpc2"
 	"github.com/sourcegraph/go-langserver/pkg/lsp"
+	"github.com/sourcegraph/jsonrpc2"
 )
 
 var (
@@ -143,6 +143,28 @@ func handle(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2.Request) (in
 				Start: lsp.Position{Line: 0, Character: 4},
 				End:   lsp.Position{Line: 0, Character: 6},
 			},
+		}}, nil
+	case "workspace/symbol":
+		var params lsp.WorkspaceSymbolParams
+		if err := json.Unmarshal(*req.Params, &params); err != nil {
+			return nil, err
+		}
+		return []lsp.SymbolInformation{{
+			Name: "fooFunc",
+			Kind: lsp.SKFunction,
+			Location: lsp.Location{
+				URI:   "file:///some-file",
+				Range: lsp.Range{Start: lsp.Position{Line: 0, Character: 0}, End: lsp.Position{Line: 0, Character: 3}},
+			},
+			ContainerName: "pkg",
+		}, {
+			Name: "BarClass",
+			Kind: lsp.SKClass,
+			Location: lsp.Location{
+				URI:   "file:///another-file",
+				Range: lsp.Range{Start: lsp.Position{Line: 1, Character: 2}, End: lsp.Position{Line: 1, Character: 4}},
+			},
+			ContainerName: "pkg",
 		}}, nil
 	}
 
