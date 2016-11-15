@@ -8,15 +8,22 @@ import * as net from 'net';
 
 import { workspace, Disposable, ExtensionContext } from 'vscode';
 import { LanguageClient, LanguageClientOptions, SettingMonitor, ServerOptions, ErrorAction, ErrorHandler, CloseAction, TransportKind } from 'vscode-languageclient';
+import { TextDocumentIdentifier } from 'vscode-languageserver-types';
+import { FilesRequest, ContentRequest } from './protocol-extension-files';
+import * as vscode from 'vscode';
 
 function startLangServer(command: string, documentSelector: string | string[]): Disposable {
-	const serverOptions: ServerOptions = {
-		command: command,
-	};
-	const clientOptions: LanguageClientOptions = {
-		documentSelector: documentSelector,
-	}
-	return new LanguageClient(command, serverOptions, clientOptions).start();
+	const serverOptions: ServerOptions = { command };
+	const clientOptions: LanguageClientOptions = { documentSelector	};
+	const ls = new LanguageClient(command, serverOptions, clientOptions);
+
+	// How to send extended ClientCapabilities?
+
+	// Files extensions
+	ls.onRequest(FilesRequest.type, FilesRequest.handler);
+	ls.onRequest(ContentRequest.type, ContentRequest.handler);
+
+	return ls.start();
 }
 
 function startLangServerTCP(addr: number, documentSelector: string | string[]): Disposable {

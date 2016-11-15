@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "vscode": "^1.0.3",
-    "vscode-languageclient": "^2.6.2"
+    "vscode-languageclient": "^2.6.2",
+    "vscode-languageserver-types": "^1.0.4"
   }
 }
