@@ -1,14 +1,21 @@
 {
 	"compilerOptions": {
-		"target": "ES5",
+		"target": "ES6",
 		"module": "commonjs",
 		"moduleResolution": "node",
 		"outDir": "out",
-		"noLib": true,
-		"sourceMap": true
+		"sourceMap": true,
+		"noImplicitAny": true,
+		"strictNullChecks": true,
+		"noImplicitThis": true,
+		"noImplicitReturns": true,
+		"typeRoots": [
+			"typings/globals",
+			"typings/modules"
+		]
 	},
 	"exclude": [
 		"node_modules",
-		"server"
+		"out"
 	]
 }
