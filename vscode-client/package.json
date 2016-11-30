@@ -19,15 +19,17 @@
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -w -p ./",
-    "postinstall": "node ./node_modules/vscode/bin/install",
+    "postinstall": "node ./node_modules/vscode/bin/install && typings install",
     "vscode": "npm run vscode:prepublish && VSCODE=$(which code-insiders || which code || echo echo ERROR: neither the code nor code-insiders vscode executable is installed); USER=dummy-dont-share-vscode-instance $VSCODE --user-data-dir=$PWD/.vscode-dev/user-data --extensionHomePath=$PWD/.vscode-dev/extensions --extensionDevelopmentPath=$PWD $*"
   },
   "devDependencies": {
-    "typescript": "^2.0.9"
+    "typescript": "^2.0.9",
+    "typings": "^2.0.0"
   },
   "dependencies": {
+    "mz": "^2.6.0",
     "vscode": "^1.0.3",
-    "vscode-languageclient": "^2.6.2",
+    "vscode-languageclient": "^3.0.1-alpha.7",
     "vscode-languageserver-types": "^1.0.4"
   }
 }

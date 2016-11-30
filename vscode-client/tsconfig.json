@@ -6,7 +6,7 @@
 		"outDir": "out",
 		"sourceMap": true,
 		"noImplicitAny": true,
-		"strictNullChecks": true,
+		"strictNullChecks": false,
 		"noImplicitThis": true,
 		"noImplicitReturns": true,
 		"typeRoots": [

@@ -6,18 +6,27 @@
 
 import * as net from 'net';
 
-import { workspace, Disposable, ExtensionContext } from 'vscode';
-import { LanguageClient, LanguageClientOptions, SettingMonitor, ServerOptions, ErrorAction, ErrorHandler, CloseAction, TransportKind } from 'vscode-languageclient';
+import { workspace, ExtensionContext, Disposable } from 'vscode';
+import {
+	LanguageClientOptions,
+	SettingMonitor,
+	ServerOptions,
+	ErrorAction,
+	ErrorHandler,
+	CloseAction,
+	TransportKind
+} from 'vscode-languageclient';
 import { TextDocumentIdentifier } from 'vscode-languageserver-types';
+import { InitializeParams, TextDocumentSyncKind, InitializeResult } from 'vscode-languageclient/lib/protocol';
 import { FilesRequest, ContentRequest } from './protocol-extension-files';
 import * as vscode from 'vscode';
+
+import { LanguageClient } from './language-client';
 
 function startLangServer(command: string, documentSelector: string | string[]): Disposable {
 	const serverOptions: ServerOptions = { command };
 	const clientOptions: LanguageClientOptions = { documentSelector	};
 	const ls = new LanguageClient(command, serverOptions, clientOptions);
-
-	// How to send extended ClientCapabilities?
 
 	// Files extensions
 	ls.onRequest(FilesRequest.type, FilesRequest.handler);
@@ -29,8 +38,8 @@ function startLangServer(command: string, documentSelector: string | string[]): 
 function startLangServerTCP(addr: number, documentSelector: string | string[]): Disposable {
 	const serverOptions: ServerOptions = function() {
 		return new Promise((resolve, reject) => {
-			var client = new net.Socket();
-			client.connect(addr, "127.0.0.1", function() {
+			const client = new net.Socket();
+			client.connect(addr, "127.0.0.1", () => {
 				resolve({
 					reader: client,
 					writer: client
@@ -39,9 +48,7 @@ function startLangServerTCP(addr: number, documentSelector: string | string[]): 
 		});
 	}
 
-	const clientOptions: LanguageClientOptions = {
-		documentSelector: documentSelector,
-	}
+	const clientOptions: LanguageClientOptions = { documentSelector };
 	return new LanguageClient(`tcp lang server (port ${addr})`, serverOptions, clientOptions).start();
 }
 

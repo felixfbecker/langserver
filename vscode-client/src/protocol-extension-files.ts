@@ -14,6 +14,7 @@
 import { RequestType, RequestHandler } from 'vscode-jsonrpc';
 import { TextDocumentIdentifier, TextDocumentItem } from 'vscode-languageserver-types';
 import * as vscode from 'vscode';
+import * as fs from 'mz/fs';
 
 export interface FilesExtensionClientCapabilities {
   /**
@@ -42,21 +43,34 @@ export interface ContentParams {
  */
 export namespace ContentRequest {
 
-  export const type: RequestType<ContentParams, TextDocumentItem, void> = {
-    method: 'textDocument/xcontent'
+  export const type: RequestType<ContentParams, TextDocumentItem, void, void> = {
+    method: 'textDocument/xcontent',
+    _: undefined
   };
 
   export const handler: RequestHandler<ContentParams, TextDocumentItem, void> =
     async (params: ContentParams, token: vscode.CancellationToken): Promise<TextDocumentItem> => {
       // This is not nice because it will open the text document and emit didOpenTextDocument events,
       // which we don't want. I couldn't find another way to get the text document content from VS Code though
-      const document = await vscode.workspace.openTextDocument(vscode.Uri.parse(params.textDocument.uri));
-      return {
-        uri: document.uri.toString(),
-        languageId: document.languageId,
-        version: document.version,
-        text: document.getText()
-      };
+      const textDocument = vscode.workspace.textDocuments.find(doc => doc.uri.toString() === params.textDocument.uri);
+      if (textDocument) {
+        return {
+          uri: textDocument.uri.toString(),
+          languageId: textDocument.languageId,
+          version: textDocument.version,
+          text: textDocument.getText()
+        };
+      } else {
+        // Fall back to reading from disk
+        const fsPath = vscode.Uri.parse(params.textDocument.uri).fsPath;
+        const text = await fs.readFile(fsPath, 'utf-8');
+        return {
+          uri: params.textDocument.uri,
+          languageId: fsPath.split('.').pop(), // Language ID is the file extension
+          text,
+          version: -1 // Version is always -1
+        }
+      }
     }
 }
 
@@ -78,8 +92,9 @@ export interface FilesParams {
  */
 export namespace FilesRequest {
 
-  export const type: RequestType<FilesParams, TextDocumentIdentifier[], void> = {
-    method: 'workspace/xfiles'
+  export const type: RequestType<FilesParams, TextDocumentIdentifier[], void, void> = {
+    method: 'workspace/xfiles',
+    _: undefined
   };
   
   export const handler: RequestHandler<FilesParams, TextDocumentIdentifier[], void> =

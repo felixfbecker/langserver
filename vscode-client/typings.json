@@ -1,6 +1,8 @@
 {
   "name": "vscode-client",
-  "dependencies": {},
+  "dependencies": {
+    "mz": "registry:npm/mz#2.4.0+20161114225638"
+  },
   "globalDependencies": {
     "node": "registry:env/node#6.0.0+20161105011511"
   }
